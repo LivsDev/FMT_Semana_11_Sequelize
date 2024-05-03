@@ -1,6 +1,7 @@
 const { Router } = require('express') // 
 const Aluno = require('../models/Aluno')
 const Curso = require('../models/Curso')
+const Professor = require('../models/Professor')  
 
 const routes = new Router()
 
@@ -157,7 +158,75 @@ routes.delete('/cursos/:id', (req,res) =>{
 
 })
 
+routes.get('/professores', async (req, res) => { // Lista todos os professores
+    const professor = await Professor.findAll()
+    res.json(professor)
 
+})
+
+routes.post('/professores', async (req, res) => {
+    try {
+        const { nome, curso } = req.body;  // Assumindo que o corpo da requisição contém 'nome' e 'curso'
+
+        // Verificação se o nome foi fornecido
+        if (!nome) {
+            return res.status(400).json({ mensagem: 'O nome do professor é obrigatório' });
+        }
+
+        // Criação do professor no banco de dados
+        const professor = await Professor.create({
+            nome: nome,
+            curso: curso
+        });
+
+        // Resposta com o professor criado
+        res.status(201).json(professor);
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ error: 'Não foi possível cadastrar o professor' });
+    }
+})
+
+routes.put('/professores/:id', async (req, res) => {
+    const { id } = req.params
+    const { nome, curso } = req.body
+
+    try {
+
+        const professor = await Professor.findByPk(id)
+        if (professor) {
+
+            professor.nome = nome
+            professor.curso = curso
+            await professor.save()
+            res.status(200).json(professor)
+
+        } else {
+
+            res.status(404).json({ mensagem: 'Professor não encontrado' })
+        
+        }
+
+    } catch (error) {
+
+        res.status(500).json({ mensagem: 'Erro ao atualizar o professor ' + error.message })
+    }
+})
+
+routes.delete('/professores/:id', (req,res) =>{
+    const id = req.params.id
+   
+    Professor.destroy({
+        where:{
+            id: id
+        }
+    }) // Deleta professores da tabela por id
+
+    res.status(204).json ({ })
+  
+
+})
 
 module.exports = routes
 

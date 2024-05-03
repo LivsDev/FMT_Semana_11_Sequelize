@@ -3,7 +3,7 @@ const {connection} = require ('../database/connection')
  
 const Professor = connection.define('professores',  { 
    
-    nome_professor: {
+    nome: {
         type:DataTypes.STRING
         },
     
@@ -13,4 +13,4 @@ const Professor = connection.define('professores',  {
        
 })
 
-module.exports = Curso
+module.exports = Professor
